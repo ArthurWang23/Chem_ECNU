@@ -26,15 +26,26 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       // 本地跨域代理 https://cn.vitejs.dev/config/server-options.html#server-proxy
       proxy: {
         '/api': {
-          target: 'http://219.228.149.131:8080',
+          target: process.env.VITE_API_TARGET || 'http://219.228.149.131:8080',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api/, '')
         },
         '/chem-api': {
-          target: 'http://localhost:3000',
+          target: process.env.VITE_BACKEND_URL || 'http://localhost:3000',
           changeOrigin: true,
           ws: true
-        }
+        },
+        '/child': {
+          target: process.env.VITE_CHILD_ORIGIN || 'http://localhost:8850',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/child/, '/'),
+        },
+        // AI WS（如果用到）
+        '/ws-ai': {
+          target: process.env.VITE_WS_AI_URL || 'ws://localhost:3004',
+          changeOrigin: true,
+          ws: true
+        },  
       },
       // 预热文件以提前转换和缓存结果，降低启动期间的初始页面加载时长并防止转换瀑布
       warmup: {

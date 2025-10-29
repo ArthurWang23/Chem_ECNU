@@ -13,8 +13,7 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
   const { VITE_CDN, VITE_PORT, VITE_COMPRESSION, VITE_PUBLIC_PATH } =
     wrapperEnv(loadEnv(mode, root));
   return {
-    base: VITE_PUBLIC_PATH,
-    root,
+    base: '/child',
     resolve: {
       alias
     },
@@ -25,7 +24,17 @@ export default ({ mode }: ConfigEnv): UserConfigExport => {
       port: 8850,
       host: "0.0.0.0",
       // 本地跨域代理 https://cn.vitejs.dev/config/server-options.html#server-proxy
-      proxy: {},
+      proxy: {
+        '/chem-api': {
+          target: process.env.VITE_BACKEND_URL || 'http://localhost:3000',
+          changeOrigin: true,
+          ws: true
+        },
+        '/api': {
+          target: process.env.VITE_API_TARGET || 'http://219.228.149.131:8080',
+          changeOrigin: true
+        }
+      },
       // 预热文件以提前转换和缓存结果，降低启动期间的初始页面加载时长并防止转换瀑布
       warmup: {
         clientFiles: ["./index.html", "./src/{views,components}/*"]

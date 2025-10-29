@@ -2,6 +2,7 @@ var ws = require("nodejs-websocket");
 var io = require("socket.io-client");
 var PORT3 = 3004; //需与逆合成中PORT相同才能建立websocket连接
 var clientConnected3 = false;
+
 // var input
 ws.createServer(function (conn) {
   console.log(

@@ -46,7 +46,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, onActivated, onDeactivated, watch, nextTick} from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import axios from "axios";
@@ -69,13 +69,16 @@ const suppressBroadcast = ref(false)
 // ✅ 页面状态管理store
 const pageStateStore = usePageStateStore();
 
-// iframe源地址 - Chem_new-main项目的monitor页面
-const iframeSrc = ref("http://localhost:8850/#/monitor-standalone?iframe=true");
 
 // 🎯 新增：iframe状态管理
 const iframeInitialized = ref(false);
 const lastLoadTime = ref(0);
 const RELOAD_COOLDOWN = 30000; // 30秒内不重复加载
+
+
+const childBase = (import.meta.env.VITE_CHILD_ORIGIN || window.location.origin).replace(/\/$/, '');
+const iframeSrc = ref(`${childBase}/child/#/monitor-standalone?iframe=true`);
+const childOrigin = new URL(iframeSrc.value).origin;
 
 // ✅ 保存页面状态
 const savePageState = () => {
@@ -120,7 +123,7 @@ const restorePageState = () => {
 const safePostToIframe = (msg) => {
   if (monitorIframe.value && monitorIframe.value.contentWindow && iframeReady.value) {
     try {
-      monitorIframe.value.contentWindow.postMessage(msg, 'http://localhost:8850');
+      monitorIframe.value.contentWindow.postMessage(msg, childOrigin);
     } catch (e) {
       console.error('❌ 向 iframe 发送消息失败（将入队重试）:', e);
       pendingMessages.value.push(msg);
@@ -143,7 +146,7 @@ const flushPendingMessages = () => {
   loggedWarnTypes.clear();
   queue.forEach((m) => {
     try {
-      monitorIframe.value.contentWindow.postMessage(m, 'http://localhost:8850');
+      monitorIframe.value.contentWindow.postMessage(m, childOrigin);
     } catch (e) {
       console.error('❌ 冲刷消息失败，将保留在队列中:', e, m);
       pendingMessages.value.push(m);
@@ -379,7 +382,7 @@ const setupIframeCommunication = () => {
 // 处理来自iframe的消息
 const handleIframeMessage = async (event) => {
   // 验证来源
-  if (event.origin !== 'http://localhost:8850') {
+  if (event.origin !== childOrigin) {
     return;
   }
   
@@ -485,7 +488,7 @@ const refreshIframe = (forceReload = false) => {
         monitorIframe.value.contentWindow.postMessage({
           type: 'REQUEST_GRAPH_NODES',
           timestamp: new Date().toISOString()
-        }, 'http://localhost:8850');
+        }, childOrigin);
         console.log('✅ 已发送图形节点请求（软刷新）');
       } catch (error) {
         console.error('❌ 软刷新失败，执行硬刷新:', error);

@@ -1,20 +1,17 @@
-FROM node:20-alpine as build-stage
-
+# 1) Build
+FROM node:20-alpine AS builder
 WORKDIR /app
-RUN corepack enable
-RUN corepack prepare pnpm@latest --activate
-
-RUN npm config set registry https://registry.npmmirror.com
-
-COPY .npmrc package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
-
+COPY package*.json ./
+RUN npm ci
 COPY . .
-RUN pnpm build
+# 生产变量可通过构建时 --build-arg 注入，也可 runtime 时用 Nginx 层配置
+RUN npm run build
 
-FROM nginx:stable-alpine as production-stage
-
-COPY --from=build-stage /app/dist /usr/share/nginx/html
+# 2) Nginx runtime
+FROM nginx:1.25-alpine
+# 静态文件
+COPY --from=builder /app/dist /usr/share/nginx/html
+# 覆盖默认配置，加入反向代理与 WS 升级
+COPY ./deploy/nginx/default.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
-
 CMD ["nginx", "-g", "daemon off;"]

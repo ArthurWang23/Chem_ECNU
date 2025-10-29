@@ -1393,7 +1393,6 @@ async function response5(result) {
     myHeaders.append("token", token);
     myHeaders.append("User-Agent", "Apifox/1.0.0 (https://apifox.com)");
     myHeaders.append("Accept", "*/*");
-    myHeaders.append("Host", "219.228.149.131:8080");
     myHeaders.append("Connection", "keep-alive");
     myHeaders.append("Content-Type", "application/json");
 

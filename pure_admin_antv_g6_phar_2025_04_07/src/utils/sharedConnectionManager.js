@@ -48,12 +48,13 @@ class SharedConnectionManager {
   /**
    * 初始化连接管理器
    */
-  init() {
-    // 确定WebSocket连接地址
-    const baseUrl = process.env.NODE_ENV === 'development'
-      ? 'ws://localhost:3000'
-      : window.location.origin.replace(/^http/, 'ws');
-    this.wsUrl = `${baseUrl}/chem-api/devices/realtime`;
+  init(options = {}) {
+    const token = options.token || (typeof window !== 'undefined' && localStorage.getItem('token')) || ''
+    const qs = token ? `?token=${encodeURIComponent(token)}` : ''
+    const wsBase =
+      (import.meta?.env?.VITE_WS_URL && import.meta.env.VITE_WS_URL.replace(/^http/, 'ws')) ||
+      (typeof window !== 'undefined' ? window.location.origin.replace(/^http/, 'ws') : 'ws://localhost')
+    this.wsUrl = `${wsBase.replace(/\/$/, '')}/chem-api/devices/realtime${qs}`
     console.log(`[WS][sharedConnectionManager] init wsUrl=${this.wsUrl}`);
     // 自动连接
     this.connect();
@@ -375,9 +376,17 @@ class SharedConnectionManager {
       payload: commands
     });
   }
+  
+  getAuthTokenSafely() {
+    try {
+      return localStorage.getItem('token') || sessionStorage.getItem('token');
+    } catch {
+      return null;
+    }
+  }
 }
 
 // 创建单例实例
 const sharedConnectionManager = new SharedConnectionManager();
 
-export default sharedConnectionManager; 
+export default sharedConnectionManager;

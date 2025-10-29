@@ -47,19 +47,27 @@ class SharedConnectionManager {
   /**
    * 初始化连接管理器
    */
-  init() {
+  init(options = {}) {
     // 优先尝试 iframe 桥接
     this.tryInitBridge().then((ok) => {
       if (ok) {
         // 桥接成功，不再直连 WS
         return;
       }
-      // 确定WebSocket连接地址
-      const baseUrl = process.env.NODE_ENV === 'development'
-        ? 'ws://localhost:3000'
-        : window.location.origin.replace(/^http/, 'ws');
-      this.wsUrl = `${baseUrl}/chem-api/devices/realtime`;
-      // 自动连接
+      // 优先读取环境变量（生产环境可直接配置为 wss://your-domain/chem-api/devices/realtime）
+      const configured = import.meta?.env?.VITE_WS_URL;
+      const baseUrl = configured || (
+        process.env.NODE_ENV === 'development'
+          ? 'ws://localhost:3000'
+          : window.location.origin.replace(/^http/, 'ws')
+      );
+      const token = options.token || (typeof window !== 'undefined' && localStorage.getItem('token')) || ''
+      const qs = token ? `?token=${encodeURIComponent(token)}` : ''
+      // 优先使用环境变量，其次同源推导，避免硬编码 localhost
+      const wsBase =
+        (import.meta?.env?.VITE_WS_URL && import.meta.env.VITE_WS_URL.replace(/^http/, 'ws')) ||
+        (typeof window !== 'undefined' ? window.location.origin.replace(/^http/, 'ws') : 'ws://localhost')
+      this.wsUrl = `${wsBase.replace(/\/$/, '')}/chem-api/devices/realtime${qs}`
       this.connect();
     });
   }
@@ -69,7 +77,6 @@ class SharedConnectionManager {
    */
   connect() {
     if (this.transport === 'bridge') {
-      // 桥接模式下由父页面统一维护连接，这里不创建 WebSocket
       return;
     }
     if (this.isReconnecting.value) {
@@ -139,7 +146,25 @@ class SharedConnectionManager {
       this.startReconnectProcess();
     }
   }
-  
+  // 新增：安全获取 Token（可按你项目的实际存储位置调整）
+  getAuthTokenSafely() {
+    try {
+      // 优先从本地你的鉴权模块或 Pinia/Vuex 获取
+      // 兜底从 localStorage 读取
+      return localStorage.getItem('token') || localStorage.getItem('access_token') || '';
+    } catch {
+      return '';
+    }
+  }
+
+  // 子应用向父应用发消息时，优先使用同源（同域部署场景下更安全）
+  sendToParent(payload) {
+    try {
+      window.parent?.postMessage(payload, window.location.origin)
+    } catch (e) {
+      window.parent?.postMessage(payload, '*')
+    }
+  }
   /**
    * 🔄 启动重连机制
    */

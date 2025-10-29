@@ -852,6 +852,7 @@ import { TaskWebSocketManager } from '@/utils/taskWebSocketManager.js';
 
 const runningTasksStore = useRunningTasksStore();
 const pageStateStore = usePageStateStore();
+const monitorIframe = ref(null)
 
 export default {
   data() {
@@ -1036,7 +1037,13 @@ export default {
         console.warn('❌ 立即保存Task页面状态失败:', error);
       }
     },
-    
+    getChildOrigin(iframeEl) {
+      try {
+        return new URL(iframeEl?.src, window.location.href).origin
+      } catch {
+        return window.location.origin
+      }
+    },
     // ✅ 从store恢复页面状态
     restorePageState() {
       try {
@@ -1542,6 +1549,7 @@ Store状态：
             const sendData = () => {
               try {
                 // 🆕 传递Queue Result的完整数据
+                const childOrigin = this.getChildOrigin(iframe);
                 iframe.contentWindow.postMessage({
                   type: 'EDIT_TASK_DATA',
                   data: JSON.stringify({
@@ -1550,7 +1558,7 @@ Store状态：
                     // 🔧 明确标识这是调度后的编辑模式
                     isScheduledEdit: true
                   })
-                }, 'http://localhost:8850');
+                }, childOrigin);
                 console.log('✅ 已发送Queue Result数据到topcontrol:', this.currentEditData);
                 console.log('✅ 发送的路径设备:', this.currentEditData.matchedPath);
                 console.log('✅ 发送的图形数据:', this.currentEditData.matchData);
@@ -1611,7 +1619,8 @@ Store状态：
                 console.log(messageData)
                 console.log('📤 准备发送数据到viewInformation:', messageData);
                 
-                iframe.contentWindow.postMessage(messageData, 'http://localhost:8850');
+                const childOrigin = this.getChildOrigin(iframe);
+                iframe.contentWindow.postMessage(messageData, childOrigin);
                 console.log('✅ 已发送数据到viewInformation');
               } catch (error) {
                 console.error('❌ 发送postMessage失败:', error);
@@ -1651,7 +1660,6 @@ Store状态：
           myHeaders.append("token", token);
           myHeaders.append("User-Agent", "Apifox/1.0.0 (https://apifox.com)");
           myHeaders.append("Accept", "*/*");
-          myHeaders.append("Host", "219.228.149.131:8080");
           myHeaders.append("Connection", "keep-alive");
 
           const requestOptions = {
@@ -1898,7 +1906,8 @@ Store状态：
                   data: JSON.stringify(row.queueResult.pathGraph)
                 };
                 
-                iframe.contentWindow.postMessage(messageData, 'http://localhost:8850');
+                const childOrigin = this.getChildOrigin(iframe);
+                iframe.contentWindow.postMessage(messageData, childOrigin);
                 console.log('✅ 已发送queue结果数据到viewInformation');
               } catch (error) {
                 console.error('❌ 发送queue结果数据失败:', error);
@@ -1995,7 +2004,6 @@ Store状态：
         myHeaders.append("token", token);
         myHeaders.append("User-Agent", "Apifox/1.0.0 (https://apifox.com)");
         myHeaders.append("Accept", "*/*");
-        myHeaders.append("Host", "219.228.149.131:8080");
         myHeaders.append("Connection", "keep-alive");
 
         const requestOptions = {
@@ -3051,7 +3059,8 @@ Store状态：
                   data: JSON.stringify(taskExecution.pathGraph || {})
                 };
                 
-                iframe.contentWindow.postMessage(messageData, 'http://localhost:8850');
+                const childOrigin = this.getChildOrigin(iframe);
+                iframe.contentWindow.postMessage(messageData, childOrigin);
                 console.log('✅ 已发送任务路径图数据到viewInformation');
               } catch (error) {
                 console.error('❌ 发送路径图数据失败:', error);
@@ -5748,7 +5757,8 @@ Store状态：
           this.ws_ai.close();
         }
         
-        this.ws_ai = new WebSocket("ws://localhost:3004");
+        const aiUrl = (import.meta.env && import.meta.env.VITE_WS_AI_URL) ? import.meta.env.VITE_WS_AI_URL : (window.location.origin.replace(/^http/, 'ws') + '/ws-ai');
+        this.ws_ai = new WebSocket(aiUrl);
         
         this.ws_ai.onopen = () => {
           console.log("✅ AI调度WebSocket连接已建立");
@@ -5903,13 +5913,14 @@ Store状态：
               console.log('✅ 找到监控iframe，发送自动加载消息');
               
               // 首先发送自动加载结构消息
+              const childOrigin = this.getChildOrigin(monitorIframe);
               monitorIframe.contentWindow.postMessage({
                 type: 'AUTO_LOAD_STRUCTURE',
                 data: JSON.stringify({
                   action: 'loadFirstAvailableStructure',
                   reason: 'workflow_execution'
                 })
-              }, 'http://localhost:8850');
+              }, childOrigin);
               
               // 然后延迟发送任务数据
               setTimeout(() => {
@@ -5921,13 +5932,13 @@ Store状态：
                     editData: taskData,
                     isMonitorMode: true
                   })
-                }, 'http://localhost:8850');
+                }, childOrigin);
                 
                 setTimeout(() => {
                   monitorIframe.contentWindow.postMessage({
                     type: 'ROW_DATA',
                     data: JSON.stringify(taskData.pathGraph || {})
-                  }, 'http://localhost:8850');
+                  }, childOrigin);
                 }, 1000);
                 
                 console.log('📤 已直接发送消息到iframe');
@@ -6191,6 +6202,7 @@ Store状态：
         
         // 🎯 发送高亮消息到监控界面
         try {
+          const childOrigin = this.getChildOrigin(monitorIframe);
           monitorIframe.contentWindow.postMessage({
             type: 'REALTIME_HIGHLIGHT',
             data: JSON.stringify({
@@ -6205,7 +6217,7 @@ Store状态：
               highlightColor: '#ff6b35', // 工作流高亮颜色
               timestamp: new Date().toISOString()
             })
-          }, 'http://localhost:8850');
+          }, childOrigin);
           
           console.log(`✅ 已发送任务 ${currentTask.taskName} 的高亮消息`);
           
@@ -6220,7 +6232,7 @@ Store状态：
                 deviceCount: validDevicePath.length,
                 estimatedTime: currentTask.reactTime || currentTask.duration || 'Unknown'
               })
-            }, 'http://localhost:8850');
+            }, childOrigin);
           }, 500);
           
         } catch (error) {
@@ -6293,10 +6305,11 @@ Store状态：
         if (monitorIframe && monitorIframe.contentWindow) {
           try {
             // 发送准备状态检查
+            const childOrigin = this.getChildOrigin(monitorIframe);
             monitorIframe.contentWindow.postMessage({
               type: 'IFRAME_READY_CHECK',
               timestamp: new Date().toISOString()
-            }, 'http://localhost:8850');
+            }, childOrigin);
             
             console.log('✅ 已发送iframe准备状态检查');
             
@@ -6373,7 +6386,8 @@ Store状态：
           if (monitorIframe && monitorIframe.contentWindow) {
             try {
               // 发送到iframe
-              monitorIframe.contentWindow.postMessage(highlightMessage, 'http://localhost:8850');
+              const childOrigin = this.getChildOrigin(monitorIframe);
+              monitorIframe.contentWindow.postMessage(highlightMessage, childOrigin);
               console.log('✅ 实时高亮数据已直接发送到iframe (尝试' + (attemptCount + 1) + '次)');
               
               // 同时通过window消息转发（备用方案）
@@ -6410,7 +6424,8 @@ Store状态：
             const delayedIframe = document.querySelector('#app iframe[src*="monitor-standalone"]');
             if (delayedIframe && delayedIframe.contentWindow) {
               try {
-                delayedIframe.contentWindow.postMessage(highlightMessage, 'http://localhost:8850');
+                const childOrigin = this.getChildOrigin(delayedIframe);
+                delayedIframe.contentWindow.postMessage(highlightMessage, childOrigin);
                 console.log('✅ 延迟发送实时高亮数据到monitor页面iframe');
               } catch (error) {
                 console.error('❌ 延迟发送失败:', error);
@@ -6691,10 +6706,11 @@ Store状态：
       
       // 🎯 方法4：成功找到iframe，发送请求
       try {
+        const childOrigin = this.getChildOrigin(monitorIframe);
         monitorIframe.contentWindow.postMessage({
           type: 'REQUEST_GRAPH_NODES',
           timestamp: new Date().toISOString()
-        }, 'http://localhost:8850');
+        }, childOrigin);
         console.log('✅ 已发送图形节点请求到监控界面');
       } catch (error) {
         console.error('❌ 请求图形节点失败:', error);
@@ -6759,7 +6775,6 @@ Store状态：
         myHeaders.append("User-Agent", "Apifox/1.0.0 (https://apifox.com)");
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Accept", "*/*");
-        myHeaders.append("Host", "219.228.149.131:8080");
         myHeaders.append("Connection", "keep-alive");
 
         const requestOptions = {
@@ -6932,7 +6947,6 @@ Store状态：
                 myHeaders.append("User-Agent", "Apifox/1.0.0 (https://apifox.com)");
                 myHeaders.append("Content-Type", "application/json");
                 myHeaders.append("Accept", "*/*");
-                myHeaders.append("Host", "219.228.149.131:8080");
                 myHeaders.append("Connection", "keep-alive");
 
                 // 1. 更新任务的graph数据

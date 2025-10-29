@@ -29,13 +29,8 @@ export type RefreshTokenResult = {
 
 /** 登录 */
 export const getLogin = (data?: object) => {
-  return http.request<UserResult>("post", "http://219.228.149.131:8080/login", {
+  return http.request<UserResult>("post", "/api/login", {
     data,
-    headers: {
-      "token": "",
-      "Content-Type": "application/json",
-      "Accept": "*/*"
-    }
   });
 };
 
