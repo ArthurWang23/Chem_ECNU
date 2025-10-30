@@ -49,11 +49,11 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             // 获取后端路由
             return initRouter().then(() => {
               router.push(getTopMenu(true).path).then(() => {
-                message("登录成功", { type: "success" });
+                message("Login successful", { type: "success" });
               });
             });
           } else {
-            message("登录失败", { type: "error" });
+            message("Login failed", { type: "error" });
           }
         })
         .finally(() => (loading.value = false));
@@ -112,7 +112,7 @@ onBeforeUnmount(() => {
                 :rules="[
                   {
                     required: true,
-                    message: '请输入账号',
+                    message: 'Please enter account',
                     trigger: 'blur'
                   }
                 ]"
@@ -121,7 +121,7 @@ onBeforeUnmount(() => {
                 <el-input
                   v-model="ruleForm.username"
                   clearable
-                  placeholder="账号"
+                  placeholder="Account"
                   :prefix-icon="useRenderIcon(User)"
                 />
               </el-form-item>
@@ -133,7 +133,7 @@ onBeforeUnmount(() => {
                   v-model="ruleForm.password"
                   clearable
                   show-password
-                  placeholder="密码"
+                  placeholder="Password"
                   :prefix-icon="useRenderIcon(Lock)"
                 />
               </el-form-item>
@@ -147,7 +147,7 @@ onBeforeUnmount(() => {
                 :loading="loading"
                 @click="onLogin(ruleFormRef)"
               >
-                登录
+                Login
               </el-button>
             </Motion>
           </el-form>

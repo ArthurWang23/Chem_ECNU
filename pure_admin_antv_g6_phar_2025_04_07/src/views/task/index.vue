@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- 工具栏 -->
+    <!-- Toolbar -->
     <div class="task-toolbar">
       <el-button 
         type="primary" 
@@ -10,10 +10,10 @@
         :loading="isExecutingWorkflow"
       >
         <i class="el-icon-play"></i>
-        {{ isExecutingWorkflow ? '启动中...' : 'Run 执行工作流' }}
+        {{ isExecutingWorkflow ? 'Starting...' : 'Run Workflow' }}
       </el-button>
       
-      <!-- 🔧 添加调试按钮 -->
+      <!-- 🔧 Add debug button -->
       <el-button 
         type="primary" 
         style="margin-bottom: 20px; margin-left: 10px;" 
@@ -22,10 +22,10 @@
         :disabled="isScheduling"
       >
         <i class="el-icon-search"></i>
-        {{ isScheduling ? '调度中...' : '检查调度状态' }}
+        {{ isScheduling ? 'Scheduling...' : 'Check Schedule Status' }}
       </el-button>
       
-      <!-- 🔧 添加状态调试按钮 -->
+      <!-- 🔧 Add state debug button -->
       <el-button 
         type="warning" 
         style="margin-bottom: 20px; margin-left: 10px;" 
@@ -33,10 +33,10 @@
         size="small"
       >
         <i class="el-icon-warning"></i>
-        状态调试
+        State Debug
       </el-button>
       
-      <!-- 🔧 添加状态恢复按钮 -->
+      <!-- 🔧 Add state restore button -->
       <el-button 
         type="success" 
         style="margin-bottom: 20px; margin-left: 10px;" 
@@ -44,26 +44,26 @@
         size="small"
       >
         <i class="el-icon-refresh"></i>
-        强制恢复
+        Force Restore
       </el-button>
       
-      <!-- 🎯 简化的状态提示 -->
+      <!-- 🎯 Simplified status prompt -->
       <div v-if="isExecutingWorkflow" class="workflow-status-simple">
         <el-alert 
-          title="工作流已启动" 
+          title="Workflow Started" 
           type="success" 
-          description="已跳转到监控界面，请查看工作流执行状态" 
+          description="Redirected to monitoring interface, please check workflow execution status" 
           show-icon 
           :closable="false">
         </el-alert>
       </div>
       
-      <!-- 🆕 调度状态提示 -->
+      <!-- 🆕 Scheduling status prompt -->
       <div v-if="isScheduling" class="scheduling-status-simple" style="margin-top: 10px;">
         <el-alert 
-          title="正在调度任务" 
+          title="Scheduling Tasks" 
           type="info" 
-          description="请稍候，正在为选中的任务生成最优调度方案..." 
+          description="Please wait, generating optimal scheduling plan for selected tasks..." 
           show-icon 
           :closable="false">
         </el-alert>
@@ -190,7 +190,7 @@
             :loading="row.loadingParameters"
           >
             <i class="el-icon-setting"></i>
-            参数
+            Parameters
           </el-button>
         </template>
       </el-table-column>
@@ -226,7 +226,7 @@
             :type="row.queueResult ? 'primary' : 'default'"
             @click="handleEdit(row)"
             :disabled="!row.queueResult"
-            :title="!row.queueResult ? '请先进行调度(scheduling)后再编辑参数' : '编辑任务参数'"
+            :title="!row.queueResult ? 'Please schedule first before editing parameters' : 'Edit task parameters'"
           >
             <i class="el-icon-edit"></i>
             Edit
@@ -244,7 +244,7 @@
             :disabled="row.status === 1 || isExecutingWorkflow || !row.queueResult"
             @click="handleRunSingleTask(row)"
           >
-            {{ row.status === 1 ? '运行中' : '运行' }}
+            {{ row.status === 1 ? 'Running' : 'Run' }}
           </el-button>
         </template>
       </el-table-column>
@@ -255,7 +255,7 @@
       <div class="selection-info">
         <span class="selected-count">{{ selectedRows.length }} item(s) selected</span>
         
-        <!-- 🚀 并发执行信息 -->
+        <!-- 🚀 Concurrent execution info -->
         <div class="concurrent-info" v-if="concurrentExecution.enabled && selectedRows.length > 1">
           <el-tag 
             size="small" 
@@ -265,7 +265,7 @@
             style="cursor: pointer; margin-left: 8px;"
           >
             <i class="el-icon-cpu"></i>
-            并发分析
+            Concurrent Analysis
           </el-tag>
         </div>
       </div>
@@ -277,22 +277,22 @@
           :disabled="selectedRows.length === 0 || isScheduling"
           :loading="isScheduling"
         >
-          {{ isScheduling ? '调度中...' : 'scheduling' }}
+          {{ isScheduling ? 'Scheduling...' : 'scheduling' }}
         </el-button>
         
-        <!-- 🔧 并发执行开关 -->
-        <el-tooltip content="开启/关闭并发执行优化">
+        <!-- 🔧 Concurrent execution switch -->
+        <el-tooltip content="Enable/disable concurrent execution optimization">
           <el-switch
             v-model="concurrentExecution.enabled"
             size="small"
-            active-text="并发"
-            inactive-text="顺序"
+            active-text="Concurrent"
+            inactive-text="Sequential"
             style="margin-left: 8px;"
           ></el-switch>
         </el-tooltip>
         
-        <!-- 🧪 测试实时高亮按钮 -->
-        <el-tooltip content="测试监控界面的实时高亮功能">
+        <!-- 🧪 Test real-time highlight button -->
+        <el-tooltip content="Test real-time highlight function of monitoring interface">
           <el-button 
             size="small" 
             type="warning"
@@ -300,12 +300,12 @@
             style="margin-left: 8px;"
           >
             <i class="el-icon-view"></i>
-            测试高亮
+            Test Highlight
           </el-button>
         </el-tooltip>
         
-        <!-- 🧹 清除高亮按钮 -->
-        <el-tooltip content="清除监控界面的所有高亮效果">
+        <!-- 🧹 Clear highlight button -->
+        <el-tooltip content="Clear all highlight effects on monitoring interface">
           <el-button 
             size="small" 
             type="info"
@@ -313,12 +313,12 @@
             style="margin-left: 8px;"
           >
             <i class="el-icon-refresh"></i>
-            清除高亮
+            Clear Highlight
           </el-button>
         </el-tooltip>
         
-        <!-- 🔍 调试按钮 -->
-        <el-tooltip content="查看监控界面当前图形的节点信息">
+        <!-- 🔍 Debug button -->
+        <el-tooltip content="View node information of current graph in monitoring interface">
           <el-button 
             size="small" 
             type="primary"
@@ -326,7 +326,7 @@
             style="margin-left: 8px;"
           >
             <i class="el-icon-search"></i>
-            调试节点
+            Debug Nodes
           </el-button>
         </el-tooltip>
       </div>
@@ -383,35 +383,35 @@
     <!-- Parameters Dialog -->
     <el-dialog 
       v-model="parametersDialogVisible" 
-      title="任务参数详情" 
+      title="Task Parameter Details" 
       width="70%"
       :close-on-click-modal="false"
     >
       <div v-if="currentParametersData">
-        <!-- 任务基本信息 -->
+        <!-- Task basic information -->
         <div class="task-info-section">
-          <h3>任务信息</h3>
+          <h3>Task Information</h3>
           <el-descriptions :column="2" border>
-            <el-descriptions-item label="任务ID">{{ currentParametersData.taskId }}</el-descriptions-item>
-            <el-descriptions-item label="任务名称">{{ currentParametersData.taskName }}</el-descriptions-item>
-            <el-descriptions-item label="任务键值">{{ currentParametersData.taskKey }}</el-descriptions-item>
-            <el-descriptions-item label="产物">{{ currentParametersData.product }}</el-descriptions-item>
-            <el-descriptions-item label="反应时间">{{ currentParametersData.reactTime }} 小时</el-descriptions-item>
-            <el-descriptions-item label="参数更新时间">{{ currentParametersData.updatedAt || '未设置' }}</el-descriptions-item>
+            <el-descriptions-item label="Task ID">{{ currentParametersData.taskId }}</el-descriptions-item>
+            <el-descriptions-item label="Task Name">{{ currentParametersData.taskName }}</el-descriptions-item>
+            <el-descriptions-item label="Task Key">{{ currentParametersData.taskKey }}</el-descriptions-item>
+            <el-descriptions-item label="Product">{{ currentParametersData.product }}</el-descriptions-item>
+            <el-descriptions-item label="Reaction Time">{{ currentParametersData.reactTime }} hours</el-descriptions-item>
+            <el-descriptions-item label="Parameter Update Time">{{ currentParametersData.updatedAt || 'Not set' }}</el-descriptions-item>
           </el-descriptions>
         </div>
 
-        <!-- 设备参数 -->
+        <!-- Device parameters -->
         <div class="device-parameters-section" v-if="currentParametersData.parameters && Object.keys(currentParametersData.parameters).length > 0">
-          <h3>设备参数</h3>
+          <h3>Device Parameters</h3>
           <el-table :data="formattedParameters" border style="width: 100%">
-            <el-table-column prop="deviceId" label="设备ID" width="120"></el-table-column>
-            <el-table-column prop="deviceType" label="设备类型" width="100">
+            <el-table-column prop="deviceId" label="Device ID" width="120"></el-table-column>
+            <el-table-column prop="deviceType" label="Device Type" width="100">
               <template #default="{ row }">
                 <el-tag :type="getDeviceTypeColor(row.deviceType)">{{ getDeviceTypeName(row.deviceType) }}</el-tag>
               </template>
             </el-table-column>
-            <el-table-column prop="parameters" label="参数设置" min-width="300">
+            <el-table-column prop="parameters" label="Parameter Settings" min-width="300">
               <template #default="{ row }">
                 <div class="parameter-list">
                   <div v-for="(value, key) in row.parameters" :key="key" class="parameter-item">
@@ -424,23 +424,23 @@
           </el-table>
         </div>
 
-        <!-- 无参数提示 -->
+        <!-- No parameters prompt -->
         <div v-else class="no-parameters">
-          <el-empty description="该任务暂无设备参数设置">
-            <el-button type="primary" @click="handleEditFromParameters">去设置参数</el-button>
+          <el-empty description="This task has no device parameter settings">
+            <el-button type="primary" @click="handleEditFromParameters">Set Parameters</el-button>
           </el-empty>
         </div>
       </div>
 
-      <!-- 加载状态 -->
+      <!-- Loading state -->
       <div v-else class="loading-container">
         <el-skeleton :rows="5" animated />
       </div>
 
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="parametersDialogVisible = false">关闭</el-button>
-          <el-button type="primary" @click="handleEditFromParameters" v-if="currentParametersData">编辑参数</el-button>
+          <el-button @click="parametersDialogVisible = false">Close</el-button>
+          <el-button type="primary" @click="handleEditFromParameters" v-if="currentParametersData">Edit Parameters</el-button>
         </span>
       </template>
     </el-dialog>

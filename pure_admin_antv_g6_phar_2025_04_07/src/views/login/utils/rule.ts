@@ -1,19 +1,19 @@
 import { reactive } from "vue";
 import type { FormRules } from "element-plus";
 
-/** 登录校验 */
+/** Login validation */
 const loginRules = reactive(<FormRules>{
   username: [
     {
       required: true,
-      message: "请输入用户名",
+      message: "Please enter username",
       trigger: "blur"
     }
   ],
   password: [
     {
       required: true,
-      message: "请输入密码",
+      message: "Please enter password",
       trigger: "blur"
     }
   ]

@@ -45,7 +45,7 @@ const router = useRouter();
           }
         }"
       >
-        抱歉，你无权访问该页面
+        Sorry, you don't have permission to access this page
       </p>
       <el-button
         v-motion

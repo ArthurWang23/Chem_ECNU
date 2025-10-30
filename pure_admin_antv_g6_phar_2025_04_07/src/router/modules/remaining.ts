@@ -6,7 +6,7 @@ export default [
     name: "Login",
     component: () => import("@/views/login/index.vue"),
     meta: {
-      title: "登录",
+      title: "Login",
       showLink: false,
       rank: 101
     }
@@ -15,7 +15,7 @@ export default [
     path: "/redirect",
     component: Layout,
     meta: {
-      title: "加载中...",
+      title: "Loading...",
       showLink: false,
       rank: 102
     },

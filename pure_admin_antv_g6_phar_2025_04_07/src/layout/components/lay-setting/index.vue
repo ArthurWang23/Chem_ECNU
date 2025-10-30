@@ -141,17 +141,17 @@ function setFalse(Doms): any {
   });
 }
 
-/** 页宽 */
+/** Page width */
 const stretchTypeOptions = computed<Array<OptionsType>>(() => {
   return [
     {
-      label: "固定",
-      tip: "紧凑页面，轻松找到所需信息",
+      label: "Fixed",
+      tip: "Compact page, easily find required information",
       value: "fixed"
     },
     {
-      label: "自定义",
-      tip: "最小1280、最大1600",
+      label: "Custom",
+      tip: "Minimum 1280, Maximum 1600",
       value: "custom"
     }
   ];

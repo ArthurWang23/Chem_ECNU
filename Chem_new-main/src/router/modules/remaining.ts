@@ -6,7 +6,7 @@ export default [
     name: "Login",
     component: () => import("@/views/login/index.vue"),
     meta: {
-      title: "登录",
+      title: "Login",
       showLink: false,
       rank: 101
     }
@@ -16,7 +16,7 @@ export default [
     name: "MonitorStandalone",
     component: () => import("@/views/monitor-standalone/index.vue"),
     meta: {
-      title: "硬件监控"
+      title: "Hardware Monitor"
     }
   },
   {
@@ -24,7 +24,7 @@ export default [
     name: "Topcontrol",
     component: () => import("@/views/topcontrol/index.vue"),
     meta: {
-      title: "结构控制2"
+      title: "Structure Control 2"
     }
   },
   {
@@ -32,14 +32,14 @@ export default [
     name: "viewInformation",
     component: () => import("@/views/viewInformation/index.vue"),
     meta: {
-      title: "视图界面"
+      title: "View Interface"
     }
   },
   {
     path: "/redirect",
     component: Layout,
     meta: {
-      title: "加载中...",
+      title: "Loading...",
       showLink: false,
       rank: 102
     },

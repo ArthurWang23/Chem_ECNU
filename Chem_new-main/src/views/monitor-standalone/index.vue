@@ -1,42 +1,42 @@
 <template>
   <div class="main-container">
 
-    <!-- 工具栏 - 始终显示，包含创建模式和反应路径按钮 -->
+    <!-- Toolbar - Always visible, includes create mode and reaction path buttons -->
     <div class="toolbar">
       
-      <!-- 创建反应路径按钮 - 非编辑模式显示 -->
+      <!-- Create reaction path button - Show in non-edit mode -->
       <button 
         v-if="isAdmin && !isEditMode"
         class="tool-button" 
         :class="{ 'active': isCreateMode }"
         @click="isCreateMode ? exitCreateMode() : enterCreateMode()"
       >
-        {{ isCreateMode ? '退出创建模式' : '创建硬件结构' }}
+        {{ isCreateMode ? 'Exit Create Mode' : 'Create Hardware Structure' }}
       </button>
       
-      <!-- 保存反应路径按钮，仅在创建模式下显示 -->
+      <!-- Save reaction path button, only show in create mode -->
       <button 
         v-if="isAdmin && isCreateMode && !isEditMode" 
         class="tool-button save-button"
         @click="openSaveDialog"
       >
-        保存硬件结构
+        Save Hardware Structure
       </button>
       
-      <!-- 撤销操作按钮，仅在创建模式下显示 -->
+      <!-- Undo operation button, only show in create mode -->
       <button 
         v-if="isAdmin && isCreateMode && !isEditMode" 
         class="tool-button undo-button"
         @click="undoLastOperation"
         :disabled="operationHistory.length === 0"
-        title="撤销上一步操作 (Ctrl+Z)"
+        title="Undo last operation (Ctrl+Z)"
       >
-        撤销上一步 <span v-if="operationHistory.length > 0" class="operation-count">({{ operationHistory.length }})</span>
+        Undo Last Step <span v-if="operationHistory.length > 0" class="operation-count">({{ operationHistory.length }})</span>
       </button>
 
     </div>
 
-    <!-- 创建模式侧边栏 - 仅在创建模式下显示 -->
+    <!-- Create mode sidebar - Only show in create mode -->
     <div
       v-if="isAdmin && isCreateMode"
       class="sidebar create-mode-sidebar"
@@ -45,11 +45,11 @@
         'sidebar-hidden': !isSidebarOpen
       }"
     >
-      <h3>创建硬件结构</h3>
+      <h3>Create Hardware Structure</h3>
       
-      <!-- 设备图标拖拽区 -->
+      <!-- Device icon drag area -->
       <div class="icons-container">
-        <h4>可用设备</h4>
+        <h4>Available Devices</h4>
         <div
           v-for="(icon, index) in nodeIcons"
           :key="index"
@@ -64,12 +64,12 @@
         </div>
       </div>
 
-      <!-- 连线模式按钮 - 仅在创建模式中显示 -->
+      <!-- Connection mode button - Only show in create mode -->
       <div class="edge-mode-container">
         <button
           class="edge-mode-button"
           :class="{ active: isEdgeMode }"
-          title="连线模式"
+          title="Connection Mode"
           @click="toggleEdgeMode"
         >
           <svg viewBox="0 0 24 24" width="20" height="20">
@@ -82,12 +82,12 @@
             <circle cx="8" cy="8" r="4" fill="currentColor" />
             <circle cx="16" cy="16" r="4" fill="currentColor" />
           </svg>
-          <span>连线模式</span>
+          <span>Connection Mode</span>
         </button>
       </div>
     </div>
 
-    <!-- 选择反应路径侧边栏 - 在非创建模式下显示 -->
+    <!-- Select reaction path sidebar - Show in non-create mode -->
     <div
       v-if="!isCreateMode"
       class="sidebar path-selector-sidebar"
@@ -96,11 +96,11 @@
         'sidebar-hidden': !isSidebarOpen
       }"
     >
-      <h3>选择硬件结构</h3>
+      <h3>Select Hardware Structure</h3>
       
-      <!-- 用户保存的硬件结构 -->
+      <!-- User saved hardware structures -->
       <div v-if="savedPaths.length > 0" class="path-section">
-        <h4>自定义结构</h4>
+        <h4>Custom Structures</h4>
         <div class="path-options">
           <div 
             v-for="path in savedPaths" 
@@ -111,52 +111,52 @@
             <span @click="loadStructureFromFile(path)">{{ path.name }}</span>
             <button 
               class="delete-path-btn" 
-              title="删除此路径"
+              title="Delete this path"
               @click.stop="openDeletePathDialog(path)"
             >×</button>
           </div>
         </div>
       </div>
       
-      <!-- 图标说明区域 -->
+      <!-- Icon legend area -->
       <div class="icons-legend-section">
-        <h4>设备图标说明</h4>
+        <h4>Device Icon Legend</h4>
         <div class="icons-legend">
           <div class="legend-item">
             <img :src="pump" class="legend-icon" />
-            <span>泵 - 用于精确控制液体流动</span>
+            <span>Pump - For precise liquid flow control</span>
           </div>
           <div class="legend-item">
             <img :src="valve" class="legend-icon" />
-            <span>阀门 - 控制流体通道的开关</span>
+            <span>Valve - Controls fluid channel on/off</span>
           </div>
           <div class="legend-item">
             <img :src="chip" class="legend-icon" />
-            <span>加热芯片 - 控制反应温度</span>
+            <span>Heating Chip - Controls reaction temperature</span>
           </div>
           <div class="legend-item">
             <img :src="bottle" class="legend-icon" />
-            <span>瓶 - 存储反应物或产物</span>
+            <span>Bottle - Stores reactants or products</span>
           </div>
           <div class="legend-item">
             <img :src="mfc" class="legend-icon" />
-            <span>MFC控制器 - 控制气体流量</span>
+            <span>MFC Controller - Controls gas flow rate</span>
           </div>
           <div class="legend-item">
             <img :src="light" class="legend-icon" />
-            <span>光照控制 - 提供光催化条件</span>
+            <span>Light Control - Provides photocatalytic conditions</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 加载指示器 -->
+    <!-- Loading indicator -->
     <div v-if="isLoading" class="loading-overlay">
       <div class="loading-spinner"></div>
-      <div class="loading-text">加载中...</div>
+      <div class="loading-text">Loading...</div>
     </div>
     
-    <!-- 错误提示 -->
+    <!-- Error message -->
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
       <button class="close-error-btn" @click="errorMessage = ''">×</button>
@@ -176,168 +176,168 @@
       @drop="isCreateMode ? handleDrop($event) : null"
     />
 
-    <!-- 设备控制面板 -->
+    <!-- Device control panel -->
     <div v-if="showControlPanel" class="device-control-panel">
       <div class="panel-content">
-        <!-- 设备ID和状态 -->
+        <!-- Device ID and status -->
         <div class="device-info">
           <div class="device-header">
-            <div class="device-title">设备控制: {{ deviceData.id }}</div>
+            <div class="device-title">Device Control: {{ deviceData.id }}</div>
             <div class="data-source-indicator" :class="{ 'connected': isHardwareConnected, 'disconnected': !isHardwareConnected }">
-              {{ isHardwareConnected ? '已连接到硬件设备' : '硬件设备未连接' }}
+              {{ isHardwareConnected ? 'Connected to hardware device' : 'Hardware device not connected' }}
             </div>
           <button class="close-btn" @click="closeControlPanel">×</button>
           </div>
           <div class="device-status" :class="deviceData.status">
-            状态: {{ translateStatus(deviceData.status) }}
+            Status: {{ translateStatus(deviceData.status) }}
           </div>
         </div>
 
-        <!-- 泵控制 -->
+        <!-- Pump control -->
         <div v-if="deviceData.type === 'pump'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status area -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">当前速度:</span>
+              <span class="status-label">Current Speed:</span>
               <span class="status-value">{{ deviceData.speed }}</span>
             </div>
             <div class="status-row">
-              <span class="status-label">当前位置:</span>
+              <span class="status-label">Current Position:</span>
               <span class="status-value">{{ deviceData.position }}</span>
             </div>
             <div class="status-row">
-              <span class="status-label">吸取端口:</span>
+              <span class="status-label">Aspirate Port:</span>
               <span class="status-value">{{ deviceData.aspiratePort }}</span>
             </div>
             <div class="status-row">
-              <span class="status-label">输送端口:</span>
+              <span class="status-label">Dispense Port:</span>
               <span class="status-value">{{ deviceData.dispensePort }}</span>
             </div>
             <div class="status-row">
-              <span class="status-label">流速:</span>
+              <span class="status-label">Flow Rate:</span>
               <span class="status-value">{{ deviceData.flowRate }}</span>
             </div>
           </div>
         </div>
 
-        <!-- 阀门控制 -->
+        <!-- Valve control -->
         <div v-if="deviceData.type === 'valve'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status area -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">当前孔位:</span>
+              <span class="status-label">Current Port:</span>
               <span class="status-value">{{ deviceData.position }}</span>
             </div>
             <div class="status-row">
-              <span class="status-label">产品收集阀:</span>
-              <span class="status-value">{{ deviceData.isProductValve ? '是' : '否' }}</span>
+              <span class="status-label">Product Collection Valve:</span>
+              <span class="status-value">{{ deviceData.isProductValve ? 'Yes' : 'No' }}</span>
             </div>
           </div>
         </div>
 
-        <!-- 加热芯片控制 -->
+        <!-- Heating chip control -->
         <div v-if="deviceData.type === 'chip'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status area -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">当前温度:</span>
+              <span class="status-label">Current Temperature:</span>
               <span class="status-value">{{ deviceData.currentTemp }}°C</span>
             </div>
             <div class="status-row">
-              <span class="status-label">目标温度:</span>
+              <span class="status-label">Target Temperature:</span>
               <span class="status-value">{{ deviceData.targetTemp }}°C</span>
             </div>
             <div class="status-row">
-              <span class="status-label">加热速度:</span>
+              <span class="status-label">Heating Speed:</span>
               <span class="status-value">{{ deviceData.heatingSpeed }}</span>
             </div>
           </div>
         </div>
 
-        <!-- MFC控制 -->
+        <!-- MFC control -->
         <div v-if="deviceData.type === 'mfc'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status area -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">当前流速:</span>
+              <span class="status-label">Current Flow Rate:</span>
               <span class="status-value">{{ deviceData.flowRate }}</span>
             </div>
           </div>
         </div>
 
-        <!-- 光照控制 -->
+        <!-- Light control -->
         <div v-if="deviceData.type === 'light'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status area -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">当前光强:</span>
+              <span class="status-label">Current Intensity:</span>
               <span class="status-value">{{ deviceData.intensity }}</span>
             </div>
           </div>
         </div>
 
-        <!-- 瓶控制 -->
+        <!-- Bottle control -->
         <div v-if="deviceData.type === 'bottle'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status area -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">反应物:</span>
-              <span class="status-value">{{ deviceData.reactant || '未设置' }}</span>
+              <span class="status-label">Reactant:</span>
+              <span class="status-value">{{ deviceData.reactant || 'Not set' }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 保存路径名称对话框 -->
+    <!-- Save path name dialog -->
     <div v-if="isShowPathNameDialog" class="dialog-overlay">
       <div class="dialog-content">
-        <h3>保存硬件结构</h3>
+        <h3>Save Hardware Structure</h3>
         <div class="dialog-form">
-          <label for="pathName">名称</label>
+          <label for="pathName">Name</label>
           <input 
             id="pathName"
             v-model="pathName"
             type="text"
-            placeholder="请输入硬件结构名称"
+            placeholder="Please enter hardware structure name"
             @keyup.enter="saveCurrentPath"
           />
         </div>
         <div class="dialog-buttons">
-          <button @click="isShowPathNameDialog = false">取消</button>
-          <button class="primary-button" @click="saveCurrentPath">保存</button>
+          <button @click="isShowPathNameDialog = false">Cancel</button>
+          <button class="primary-button" @click="saveCurrentPath">Save</button>
         </div>
       </div>
     </div>
 
-    <!-- 删除路径确认对话框 -->
+    <!-- Delete path confirmation dialog -->
     <div v-if="isShowDeletePathDialog" class="dialog-overlay">
       <div class="dialog-content">
-        <h3>删除硬件结构</h3>
+        <h3>Delete Hardware Structure</h3>
         <div class="dialog-form">
-          <p>确定要删除硬件结构 "{{ pathToDelete?.name }}" 吗？此操作不可恢复。</p>
-          <p class="warning-text">此操作不可恢复！</p>
+          <p>Are you sure you want to delete hardware structure "{{ pathToDelete?.name }}"? This action cannot be undone.</p>
+          <p class="warning-text">This action cannot be undone!</p>
         </div>
         <div class="dialog-buttons">
-          <button @click="isShowDeletePathDialog = false">取消</button>
-          <button class="danger-button" @click="deleteReactionPath">删除</button>
+          <button @click="isShowDeletePathDialog = false">Cancel</button>
+          <button class="danger-button" @click="deleteReactionPath">Delete</button>
         </div>
       </div>
     </div>
 
-    <!-- WebSocket连接状态 -->
+    <!-- WebSocket connection status -->
     <div class="ws-status" :class="{ 'connected': wsConnected }">
-      <span v-if="wsConnected">已连接到服务器</span>
-      <span v-else>未连接到服务器</span>
+      <span v-if="wsConnected">Connected to server</span>
+      <span v-else>Not connected to server</span>
     </div>
 
-    <!-- 添加硬件连接控制面板 -->
+    <!-- Add hardware connection control panel -->
     <div class="hardware-control-container" 
          :class="{
            'sidebar-collapsed': !appSidebarOpened && isSidebarOpen,
@@ -346,23 +346,23 @@
       <el-card class="hardware-control-card">
         <template #header>
           <div class="hardware-card-header">
-            <span>硬件设备连接</span>
+            <span>Hardware Device Connection</span>
             <el-tag :type="isHardwareConnected ? 'success' : 'danger'" size="small">
-              {{ isHardwareConnected ? '已连接' : '未连接' }}
+              {{ isHardwareConnected ? 'Connected' : 'Disconnected' }}
             </el-tag>
           </div>
         </template>
         <div class="hardware-card-content">
           <el-form :inline="true">
-            <el-form-item label="硬件IP地址">
-              <el-input v-model="hardwareIP" placeholder="例如：192.168.1.14" :disabled="isHardwareConnected"></el-input>
+            <el-form-item label="Hardware IP Address">
+              <el-input v-model="hardwareIP" placeholder="e.g.: 192.168.1.14" :disabled="isHardwareConnected"></el-input>
             </el-form-item>
             <el-form-item>
               <el-button 
                 :type="isHardwareConnected ? 'danger' : 'primary'" 
                 :loading="isHardwareConnecting" 
                 @click="isHardwareConnected ? disconnectHardware() : connectHardware()">
-                {{ isHardwareConnected ? '断开连接' : '连接硬件' }}
+                {{ isHardwareConnected ? 'Disconnect' : 'Connect Hardware' }}
               </el-button>
             </el-form-item>
           </el-form>
@@ -373,28 +373,28 @@
       </el-card>
     </div>
 
-    <!-- 设备选择对话框 -->
+    <!-- Device selection dialog -->
     <div v-if="showDeviceSelectionDialog" class="dialog-overlay">
       <div class="dialog-content device-selection-dialog">
-        <h3>选择{{ getDeviceTypeName(dropPosition.type) }}</h3>
+        <h3>Select {{ getDeviceTypeName(dropPosition.type) }}</h3>
         
-        <!-- 搜索框 -->
+        <!-- Search box -->
         <div class="search-box">
           <input 
             v-model="deviceSearchQuery" 
             type="text" 
-            placeholder="搜索设备ID..."
+            placeholder="Search device ID..."
             @input="filterDevices"
           />
         </div>
         
-        <!-- 设备列表 -->
+        <!-- Device list -->
         <div class="device-list">
           <div v-if="filteredDevices.length === 0" class="no-devices">
-            没有可用的{{ getDeviceTypeName(dropPosition.type) }}设备
+            No available {{ getDeviceTypeName(dropPosition.type) }} devices
           </div>
           
-          <!-- 设备分组显示 -->
+          <!-- Device group display -->
           <template v-for="(group, index) in deviceGroups" :key="index">
             <div class="device-group" v-if="group.devices.length > 0">
               <div class="group-title">{{ group.title }}</div>
@@ -407,7 +407,7 @@
                 <div class="device-info">
                   <div class="device-id">{{ device.id }}</div>
                   <div class="device-module-id" v-if="device.moduleMetadata">
-                    模块ID: {{ device.moduleMetadata.moduleId }}
+                    Module ID: {{ device.moduleMetadata.moduleId }}
                   </div>
                 </div>
                 <div class="device-status" :class="device.status">
@@ -419,36 +419,36 @@
         </div>
         
         <div class="dialog-buttons">
-          <button @click="showDeviceSelectionDialog = false">取消</button>
+          <button @click="showDeviceSelectionDialog = false">Cancel</button>
         </div>
       </div>
     </div>
-    <!-- 右侧：任务队列面板（新增） -->
+    <!-- Right side: Task queue panel (new) -->
     <div class="task-queue-panel" v-if="isWorkflowRunning && runningTasksStore.getCurrentWorkflowInfo">
       <div class="panel-header" @click="isPanelOpen = !isPanelOpen">
         <div class="title">
           <span class="dot"></span>
-          正在运行与即将运行
+          Running and Upcoming Tasks
         </div>
-        <button class="toggle-btn">{{ isPanelOpen ? '收起' : '展开' }}</button>
+        <button class="toggle-btn">{{ isPanelOpen ? 'Collapse' : 'Expand' }}</button>
       </div>
       <transition name="fade">
         <div v-show="isPanelOpen" class="panel-body">
           <div class="section">
-            <div class="section-title">正在运行</div>
+            <div class="section-title">Currently Running</div>
             <div class="current-task">
               <div class="task-name" :title="currentTaskName">
-                {{ currentTaskName || '未知任务' }}
+                {{ currentTaskName || 'Unknown Task' }}
               </div>
               <div class="progress">
-                进度：{{ currentTaskIndex + 1 }}/{{ totalTasks }}
+                Progress: {{ currentTaskIndex + 1 }}/{{ totalTasks }}
               </div>
             </div>
           </div>
           <div class="divider"></div>
           <div class="section">
-            <div class="section-title">即将运行</div>
-            <div v-if="upcomingTasksPreview.length === 0" class="empty">暂无后续任务</div>
+            <div class="section-title">Upcoming Tasks</div>
+            <div v-if="upcomingTasksPreview.length === 0" class="empty">No upcoming tasks</div>
             <ul v-else class="task-list">
               <li v-for="(t, i) in upcomingTasksPreview" :key="i" :title="t">
                 <span class="badge">{{ currentTaskIndex + 2 + i }}</span>
@@ -456,16 +456,16 @@
               </li>
             </ul>
             <div v-if="upcomingTasksCount > upcomingTasksPreview.length" class="more">
-              还有 {{ upcomingTasksCount - upcomingTasksPreview.length }} 个任务…
+              {{ upcomingTasksCount - upcomingTasksPreview.length }} more tasks...
             </div>
           </div>
           <div class="divider"></div>
           <div class="section meta">
             <div class="meta-item">
-              队列长度：{{ runningQueueLength }}
+              Queue Length: {{ runningQueueLength }}
             </div>
             <div class="meta-item">
-              工作流ID：{{ (currentWorkflow && currentWorkflow.id) || '-' }}
+              Workflow ID: {{ (currentWorkflow && currentWorkflow.id) || '-' }}
             </div>
           </div>
         </div>

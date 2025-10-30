@@ -9,7 +9,7 @@
         'graph-container-collapsed': !appSidebarOpened && isSidebarOpen
       }"
     />
-    <div v-if="loading" class="loading-message">正在加载图表数据...</div>
+    <div v-if="loading" class="loading-message">Loading graph data...</div>
     <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
   </div>
 </template>
@@ -47,13 +47,13 @@ const loadGraphData = async (mapping_data) => {
     const pathConfig = JSON.parse(mapping_data);
     console.log(pathConfig)
     if (!pathConfig.nodes || !pathConfig.links) {
-      throw new Error("JSON数据格式不正确，缺少data字段");
+      throw new Error("Incorrect JSON data format, missing data field");
     }
     
     initGraph(pathConfig);
   } catch (error) {
-    console.error("加载图表数据失败:", error);
-    errorMessage.value = `加载图表数据失败: ${error.message}`;
+    console.error("Failed to load graph data:", error);
+    errorMessage.value = `Failed to load graph data: ${error.message}`;
   } finally {
     loading.value = false;
   }
@@ -62,7 +62,7 @@ const loadGraphData = async (mapping_data) => {
 // Initialize graph with loaded data
 const initGraph = (pathConfig) => {
   if (!container.value) {
-    errorMessage.value = "找不到图表容器";
+    errorMessage.value = "Graph container not found";
     return;
   }
 
@@ -108,13 +108,13 @@ const initGraph = (pathConfig) => {
         type: "image",
         data: {
           deviceType: node.data?.deviceType || node.id.split('-')[0] || 'unknown',
-          label: node.data?.label || "设备"
+          label: node.data?.label || "Device"
         },
         style: {
           x: node.style?.x || 100 + Math.random() * 300,
           y: node.style?.y || 100 + Math.random() * 200,
           size: node.style?.size || [40, 40],
-          label: node.style?.label || `设备 (${node.id})`,
+          label: node.style?.label || `Device (${node.id})`,
           labelCfg: {
             position: "bottom",
             offset: [0, 5],

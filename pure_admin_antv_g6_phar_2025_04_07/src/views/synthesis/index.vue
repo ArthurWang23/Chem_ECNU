@@ -233,7 +233,7 @@
         </span>
       </el-dialog>
 
-      <el-dialog v-model="showDetailsDialog" title="详细信息" width="800px">
+      <el-dialog v-model="showDetailsDialog" title="Details" width="800px">
         <div class="table-content">
           <el-table
             :data="currentSlideDetails"

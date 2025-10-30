@@ -8,7 +8,7 @@ export default {
   redirect: "/welcome",
   meta: {
     icon: "ep:home-filled",
-    title: "home",
+    title: "Home",
     rank: 0
   },
   children: [
@@ -17,7 +17,7 @@ export default {
       name: "Welcome",
       component: () => import("@/views/welcome/index.vue"),
       meta: {
-        title: "home",
+        title: "Home",
         showLink: VITE_HIDE_HOME === "true" ? false : true
       }
     }

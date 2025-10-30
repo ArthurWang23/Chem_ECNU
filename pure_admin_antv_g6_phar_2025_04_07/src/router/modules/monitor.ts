@@ -1,11 +1,11 @@
-// 设备监控路由
+// Device monitoring route
 export default {
   path: "/monitor",
   redirect: "/monitor/index",
   meta: {
-    icon: "Monitor", // 图标
-    title: "设备监控", // 菜单标题
-    rank: 4 // 排序，确保在合适的位置显示
+    icon: "Monitor", // Icon
+    title: "Device Monitor", // Menu title
+    rank: 4 // Sort order, ensure proper position in menu
   },
   children: [
     {
@@ -13,10 +13,10 @@ export default {
       name: "Monitor",
       component: () => import("@/views/monitor/index.vue"),
       meta: {
-        title: "Monitor", // 页面标题
-        keepAlive: true, // ✅ 启用页面缓存
+        title: "Monitor", // Page title
+        keepAlive: true, // ✅ Enable page caching
         showLink: true
       }
     }
   ]
-}; 
+};

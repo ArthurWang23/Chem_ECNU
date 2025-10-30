@@ -21,11 +21,11 @@ const username = ref(useUserStoreHook()?.username);
 const options = [
   {
     value: "admin",
-    label: "管理员角色"
+    label: "Admin Role"
   },
   {
     value: "common",
-    label: "普通角色"
+    label: "Common Role"
   }
 ];
 
@@ -45,12 +45,12 @@ function onChange() {
 <template>
   <div>
     <p class="mb-2">
-      模拟后台根据不同角色返回对应路由，观察左侧菜单变化（管理员角色可查看系统管理菜单、普通角色不可查看系统管理菜单）
+      Simulate backend returning corresponding routes based on different roles, observe left menu changes (Admin role can view system management menu, common role cannot view system management menu)
     </p>
     <el-card shadow="never" :style="elStyle">
       <template #header>
         <div class="card-header">
-          <span>当前角色：{{ username }}</span>
+          <span>Current role: {{ username }}</span>
         </div>
       </template>
       <el-select v-model="username" class="!w-[160px]" @change="onChange">

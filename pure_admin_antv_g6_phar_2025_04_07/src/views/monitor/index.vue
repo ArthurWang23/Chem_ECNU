@@ -1,16 +1,16 @@
 <template>
   <div class="monitor-iframe-container">
     <div class="iframe-header">
-      <h2 class="page-title">硬件监控</h2>
+      <h2 class="page-title">Hardware Monitor</h2>
       <div class="control-actions">
         <el-button type="primary" @click="refreshIframe(false)" :loading="isRefreshing">
-          <i class="ep:refresh"></i> 智能刷新
+          <i class="ep:refresh"></i> Smart Refresh
         </el-button>
         <el-button type="warning" @click="refreshIframe(true)" :loading="isRefreshing">
-          <i class="ep:refresh-right"></i> 强制刷新
+          <i class="ep:refresh-right"></i> Force Refresh
         </el-button>
         <el-button @click="openInNewWindow">
-          <i class="ep:new-window"></i> 新窗口打开
+          <i class="ep:new-window"></i> Open in New Window
         </el-button>
       </div>
     </div>
@@ -26,20 +26,20 @@
         @error="handleIframeError"
       ></iframe>
       
-    <!-- 加载指示器 -->
+    <!-- Loading indicator -->
       <div v-if="isLoading" class="iframe-loading">
       <div class="loading-spinner"></div>
-        <div class="loading-text">正在加载硬件监控界面...</div>
+        <div class="loading-text">Loading hardware monitoring interface...</div>
     </div>
     
-    <!-- 错误提示 -->
+    <!-- Error message -->
       <div v-if="hasError" class="iframe-error">
         <div class="error-icon">⚠️</div>
-        <div class="error-title">加载失败</div>
-        <div class="error-message">无法连接到监控服务，请检查服务状态</div>
+        <div class="error-title">Loading Failed</div>
+        <div class="error-message">Unable to connect to monitoring service, please check service status</div>
         <div class="error-actions">
-          <el-button type="primary" @click="retryLoad">重试</el-button>
-          <el-button @click="checkService">检查服务</el-button>
+          <el-button type="primary" @click="retryLoad">Retry</el-button>
+          <el-button @click="checkService">Check Service</el-button>
     </div>
             </div>
     </div>

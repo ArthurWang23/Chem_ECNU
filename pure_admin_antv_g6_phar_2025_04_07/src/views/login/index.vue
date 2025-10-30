@@ -114,7 +114,7 @@ onBeforeUnmount(() => {
                 :rules="[
                   {
                     required: true,
-                    message: '请输入账号',
+                    message: 'Please enter username',
                     trigger: 'blur'
                   }
                 ]"
@@ -123,7 +123,7 @@ onBeforeUnmount(() => {
                 <el-input
                   v-model="ruleForm.username"
                   clearable
-                  placeholder="账号"
+                  placeholder="Username"
                   :prefix-icon="useRenderIcon(User)"
                 />
               </el-form-item>
@@ -135,7 +135,7 @@ onBeforeUnmount(() => {
                   v-model="ruleForm.password"
                   clearable
                   show-password
-                  placeholder="密码"
+                  placeholder="Password"
                   :prefix-icon="useRenderIcon(Lock)"
                 />
               </el-form-item>
@@ -149,7 +149,7 @@ onBeforeUnmount(() => {
                 :loading="loading"
                 @click="onLogin(ruleFormRef)"
               >
-                登录
+                Login
               </el-button>
             </Motion>
           </el-form>

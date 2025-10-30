@@ -1,20 +1,20 @@
 <template>
   <div class="main-container">
 
-    <!-- 工具栏 - 始终显示，包含反应路径按钮 -->
+    <!-- Toolbar - Always visible, includes reaction path button -->
     <div class="toolbar">
-      <!-- 反应路径按钮 - 非编辑模式显示 -->
+      <!-- Reaction path button - Show in non-edit mode -->
       <button 
         v-if="!isEditMode"
         class="tool-button reaction-path-button"
         :class="{ 'active': isShowingReactionPath }"
         @click="toggleReactionPathPanel"
       >
-        反应路径
+        Reaction Path
       </button>
     </div>
 
-    <!-- 选择反应路径侧边栏 -->
+    <!-- Select reaction path sidebar -->
     <div
       class="sidebar path-selector-sidebar"
       :class="{
@@ -22,11 +22,11 @@
         'sidebar-hidden': !isSidebarOpen
       }"
     >
-      <h3>选择硬件结构</h3>
+      <h3>Select Hardware Structure</h3>
       
-      <!-- 用户保存的硬件结构 -->
+      <!-- User saved hardware structures -->
       <div v-if="savedPaths.length > 0" class="path-section">
-        <h4>自定义结构</h4>
+        <h4>Custom Structures</h4>
         <div class="path-options">
           <div 
             v-for="path in savedPaths" 
@@ -39,45 +39,45 @@
         </div>
       </div>
       
-      <!-- 图标说明区域 -->
+      <!-- Icon legend area -->
       <div class="icons-legend-section">
-        <h4>设备图标说明</h4>
+        <h4>Device Icon Legend</h4>
         <div class="icons-legend">
           <div class="legend-item">
             <img :src="pump" class="legend-icon" />
-            <span>泵 - 用于精确控制液体流动</span>
+            <span>Pump - For precise liquid flow control</span>
           </div>
           <div class="legend-item">
             <img :src="valve" class="legend-icon" />
-            <span>阀门 - 控制流体通道的开关</span>
+            <span>Valve - Controls fluid channel on/off</span>
           </div>
           <div class="legend-item">
             <img :src="chip" class="legend-icon" />
-            <span>加热芯片 - 控制反应温度</span>
+            <span>Heating Chip - Controls reaction temperature</span>
           </div>
           <div class="legend-item">
             <img :src="bottle" class="legend-icon" />
-            <span>瓶 - 存储反应物或产物</span>
+            <span>Bottle - Stores reactants or products</span>
           </div>
           <div class="legend-item">
             <img :src="mfc" class="legend-icon" />
-            <span>MFC控制器 - 控制气体流量</span>
+            <span>MFC Controller - Controls gas flow rate</span>
           </div>
           <div class="legend-item">
             <img :src="light" class="legend-icon" />
-            <span>光照控制 - 提供光催化条件</span>
+            <span>Light Control - Provides photocatalytic conditions</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 加载指示器 -->
+    <!-- Loading indicator -->
     <div v-if="isLoading" class="loading-overlay">
       <div class="loading-spinner"></div>
-      <div class="loading-text">加载中...</div>
+      <div class="loading-text">Loading...</div>
     </div>
     
-    <!-- 错误提示 -->
+    <!-- Error message -->
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
       <button class="close-error-btn" @click="errorMessage = ''">×</button>
@@ -103,88 +103,88 @@
       }"
     >
       <div class="panel-content">
-        <!-- 设备ID和状态 -->
+        <!-- Device ID and status -->
         <div class="device-info">
           <div 
             class="device-header draggable-header"
             @mousedown="startDrag"
           >
             <div class="drag-handle">⋮⋮</div>
-            <div class="device-title">设备控制: {{ deviceData.id }}</div>
+            <div class="device-title">Device Control: {{ deviceData.id }}</div>
             <div class="data-source-indicator" :class="{ 'connected': isHardwareConnected, 'disconnected': !isHardwareConnected }">
-              {{ isHardwareConnected ? '已连接到硬件设备' : '硬件设备未连接' }}
+              {{ isHardwareConnected ? 'Connected to hardware device' : 'Hardware device not connected' }}
             </div>
           <button class="close-btn" @click="closeControlPanel">×</button>
           </div>
           <div class="device-status" :class="deviceData.status">
-            状态: {{ translateStatus(deviceData.status) }}
+            Status: {{ translateStatus(deviceData.status) }}
           </div>
         </div>
 
-        <!-- 泵控制 -->
+        <!-- Pump control -->
         <div v-if="deviceData.type === 'pump'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status section -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">当前速度:</span>
+              <span class="status-label">Current Speed:</span>
               <span class="status-value">{{ deviceData.speed }}</span>
             </div>
             <div class="status-row">
-              <span class="status-label">当前位置:</span>
+              <span class="status-label">Current Position:</span>
               <span class="status-value">{{ deviceData.position }}</span>
             </div>
             <div class="status-row">
-              <span class="status-label">吸取端口:</span>
+              <span class="status-label">Aspirate Port:</span>
               <span class="status-value">{{ deviceData.aspiratePort }}</span>
             </div>
             <div class="status-row">
-              <span class="status-label">输送端口:</span>
+              <span class="status-label">Dispense Port:</span>
               <span class="status-value">{{ deviceData.dispensePort }}</span>
             </div>
             <div class="status-row">
-              <span class="status-label">流速:</span>
+              <span class="status-label">Flow Rate:</span>
               <span class="status-value">{{ deviceData.flowRate }}</span>
             </div>
           </div>
           
-          <!-- 控制区域 -->
+          <!-- Control section -->
           <div class="control-section">
-            <div class="section-title">参数调整</div>
+            <div class="section-title">Parameter Adjustment</div>
             <div class="data-row">
-              <span>吸取端口:</span>
+              <span>Aspirate Port:</span>
               <select 
                 v-model.number="controlParams.aspiratePort" 
                 @change="updateParameter(deviceData.id, 'pump', 'aspiratePort', controlParams.aspiratePort)"
                 class="parameter-select"
               >
-                <option value="1">端口1</option>
-                <option value="2">端口2</option>
-                <option value="3">端口3</option>
-                <option value="4">端口4</option>
-                <option value="5">端口5</option>
-                <option value="6">端口6</option>
+                <option value="1">Port 1</option>
+                <option value="2">Port 2</option>
+                <option value="3">Port 3</option>
+                <option value="4">Port 4</option>
+                <option value="5">Port 5</option>
+                <option value="6">Port 6</option>
               </select>
             </div>
             
             <div class="data-row">
-              <span>输送端口:</span>
+              <span>Dispense Port:</span>
               <select 
                 v-model.number="controlParams.dispensePort" 
                 @change="updateParameter(deviceData.id, 'pump', 'dispensePort', controlParams.dispensePort)"
                 class="parameter-select"
               >
-                <option value="1">端口1</option>
-                <option value="2">端口2</option>
-                <option value="3">端口3</option>
-                <option value="4">端口4</option>
-                <option value="5">端口5</option>
-                <option value="6">端口6</option>
+                <option value="1">Port 1</option>
+                <option value="2">Port 2</option>
+                <option value="3">Port 3</option>
+                <option value="4">Port 4</option>
+                <option value="5">Port 5</option>
+                <option value="6">Port 6</option>
               </select>
             </div>
             
             <div class="data-row">
-              <span>速度:</span>
+              <span>Speed:</span>
               <input
                 v-model.number="controlParams.speed"
                 type="number"
@@ -195,12 +195,12 @@
               <button
                 @click="updateParameter(deviceData.id, 'pump', 'speed', controlParams.speed)"
               >
-                设置
+                Set
               </button>
             </div>
             
             <div class="data-row">
-              <span>位置:</span>
+              <span>Position:</span>
               <input
                 v-model.number="controlParams.position"
                 type="number"
@@ -211,7 +211,7 @@
               <button
                 @click="updateParameter(deviceData.id, 'pump', 'position', controlParams.position)"
               >
-                设置
+                Set
               </button>
             </div>
             
@@ -219,48 +219,48 @@
               <button
                 @click="updateParameter(deviceData.id, 'pump', 'initialize', controlParams.initialize)"
               >
-                初始化
+                Initialize
               </button>
               <button
                 @click="updateParameter(deviceData.id, 'pump', 'stop', controlParams.stop)"
               >
-                停止
+                Stop
               </button>
             </div>
           </div>
         </div>
 
-        <!-- 阀门控制 -->
+        <!-- Valve control -->
         <div v-if="deviceData.type === 'valve'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status section -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">当前孔位:</span>
+              <span class="status-label">Current Position:</span>
               <span class="status-value">{{ deviceData.position }}</span>
             </div>
             <div class="status-row">
-              <span class="status-label">产品收集阀:</span>
-              <span class="status-value">{{ deviceData.isProductValve ? '是' : '否' }}</span>
+              <span class="status-label">Product Collection Valve:</span>
+              <span class="status-value">{{ deviceData.isProductValve ? 'Yes' : 'No' }}</span>
             </div>
           </div>
           
-          <!-- 控制区域 -->
+          <!-- Control section -->
           <div class="control-section">
-            <div class="section-title">参数调整</div>
+            <div class="section-title">Parameter Adjustment</div>
             <div class="control-row">
-              <span>孔位:</span>
+              <span>Position:</span>
               <select v-model.number="controlParams.port" class="parameter-select">
-                <option v-for="n in 6" :key="n" :value="n">孔位{{ n }}</option>
+                <option v-for="n in 6" :key="n" :value="n">Position {{ n }}</option>
               </select>
               <button
                 @click="updateParameter(deviceData.id, 'valve', 'port', controlParams.port)"
               >
-                设置孔位
+                Set Position
               </button>
             </div>
             <div class="control-row">
-              <span>产品收集阀:</span>
+              <span>Product Collection Valve:</span>
               <div class="toggle-switch">
                 <input
                   type="checkbox"
@@ -268,39 +268,39 @@
                   v-model="controlParams.isProductValve"
                   @change="updateParameter(deviceData.id, 'valve', 'isProductValve', controlParams.isProductValve)"
                 />
-                <label :for="`product-toggle-${deviceData.id}`">{{ controlParams.isProductValve ? '是' : '否' }}</label>
+                <label :for="`product-toggle-${deviceData.id}`">{{ controlParams.isProductValve ? 'Yes' : 'No' }}</label>
               </div>
               <div class="valve-info" v-if="controlParams.isProductValve">
-                (反应稳定后才会切换)
+                (Will switch only after reaction stabilizes)
               </div>
             </div>
           </div>
         </div>
 
-        <!-- 加热芯片控制 -->
+        <!-- Heating chip control -->
         <div v-if="deviceData.type === 'chip'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status section -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">当前温度:</span>
+              <span class="status-label">Current Temperature:</span>
               <span class="status-value">{{ deviceData.currentTemp }}°C</span>
             </div>
             <div class="status-row">
-              <span class="status-label">目标温度:</span>
+              <span class="status-label">Target Temperature:</span>
               <span class="status-value">{{ deviceData.targetTemp }}°C</span>
             </div>
             <div class="status-row">
-              <span class="status-label">加热速度:</span>
+              <span class="status-label">Heating Speed:</span>
               <span class="status-value">{{ deviceData.heatingSpeed }}</span>
             </div>
           </div>
           
-          <!-- 控制区域 -->
+          <!-- Control section -->
           <div class="control-section">
-            <div class="section-title">参数调整</div>
+            <div class="section-title">Parameter Adjustment</div>
             <div class="data-row">
-              <span>目标温度:</span>
+              <span>Target Temperature:</span>
               <input
                 v-model.number="controlParams.targetTemp"
                 type="number"
@@ -311,7 +311,7 @@
               <span class="unit">°C</span>
             </div>
             <div class="data-row">
-              <span>加热速度:</span>
+              <span>Heating Speed:</span>
               <input
                 v-model.number="controlParams.heatingSpeed"
                 type="number"
@@ -325,28 +325,28 @@
               <button
                 @click="updateParameter(deviceData.id, 'chip', 'setTemp', controlParams.targetTemp), updateParameter(deviceData.id, 'chip', 'speed', controlParams.heatingSpeed)"
               >
-                设置
+                Set
               </button>
             </div>
           </div>
         </div>
 
-        <!-- MFC控制 -->
+        <!-- MFC control -->
         <div v-if="deviceData.type === 'mfc'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status section -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">当前流速:</span>
+              <span class="status-label">Current Flow Rate:</span>
               <span class="status-value">{{ deviceData.flowRate }}</span>
             </div>
           </div>
           
-          <!-- 控制区域 -->
+          <!-- Control section -->
           <div class="control-section">
-            <div class="section-title">参数调整</div>
+            <div class="section-title">Parameter Adjustment</div>
             <div class="data-row">
-              <span>流速设置:</span>
+              <span>Flow Rate Setting:</span>
               <input
                 v-model.number="controlParams.flowRate"
                 type="number"
@@ -358,28 +358,28 @@
               <button
                 @click="updateParameter(deviceData.id, 'mfc', 'setFlowRate', controlParams.flowRate)"
               >
-                设置流速
+                Set Flow Rate
               </button>
             </div>
           </div>
         </div>
 
-        <!-- 光照控制 -->
+        <!-- Light control -->
         <div v-if="deviceData.type === 'light'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status section -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">当前光强:</span>
+              <span class="status-label">Current Intensity:</span>
               <span class="status-value">{{ deviceData.intensity }}</span>
             </div>
           </div>
           
-          <!-- 控制区域 -->
+          <!-- Control section -->
           <div class="control-section">
-            <div class="section-title">参数调整</div>
+            <div class="section-title">Parameter Adjustment</div>
             <div class="data-row">
-              <span>光强设置:</span>
+              <span>Intensity Setting:</span>
               <input
                 v-model.number="controlParams.intensity"
                 type="number"
@@ -391,39 +391,39 @@
               <button
                 @click="updateParameter(deviceData.id, 'light', 'setIntensity', controlParams.intensity)"
               >
-                设置光强
+                Set Intensity
               </button>
             </div>
           </div>
         </div>
 
-        <!-- 瓶控制 -->
+        <!-- Bottle control -->
         <div v-if="deviceData.type === 'bottle'" class="device-controls">
-          <!-- 当前状态区域 -->
+          <!-- Current status section -->
           <div class="current-status-section">
-            <div class="section-title">当前状态</div>
+            <div class="section-title">Current Status</div>
             <div class="status-row">
-              <span class="status-label">反应物:</span>
-              <span class="status-value">{{ deviceData.reactant || '未设置' }}</span>
+              <span class="status-label">Reactant:</span>
+              <span class="status-value">{{ deviceData.reactant || 'Not set' }}</span>
             </div>
           </div>
           
-          <!-- 控制区域 -->
+          <!-- Control section -->
           <div class="control-section">
-            <div class="section-title">参数调整</div>
+            <div class="section-title">Parameter Adjustment</div>
             <div class="control-row">
-              <label for="reactant">反应物:</label>
+              <label for="reactant">Reactant:</label>
               <input
                 id="reactant"
                 v-model="controlParams.reactant"
                 type="text"
-                placeholder="输入反应物名称"
+                placeholder="Enter reactant name"
                 class="reactant-input"
               />
               <button
                 @click="updateBottle(deviceData.id, 'reactant', controlParams.reactant)"
               >
-                设置
+                Set
               </button>
             </div>
           </div>
@@ -431,67 +431,67 @@
       </div>
     </div>
 
-    <!-- WebSocket连接状态 -->
+    <!-- WebSocket connection status -->
     <div class="ws-status" :class="{ 'connected': wsConnected }">
-      <span v-if="wsConnected">已连接到服务器</span>
-      <span v-else>未连接到服务器</span>
+      <span v-if="wsConnected">Connected to server</span>
+      <span v-else">Not connected to server</span>
     </div>
 
-    <!-- WebSocket连接状态指示器 -->
+    <!-- WebSocket connection status indicator -->
     <div class="websocket-status-container" :class="{ 'ws-connected': wsConnected, 'ws-disconnected': !wsConnected }">
       <div class="status-indicator"></div>
-      <span class="status-text">{{ wsConnected ? 'WebSocket已连接' : 'WebSocket未连接' }}</span>
+      <span class="status-text">{{ wsConnected ? 'WebSocket Connected' : 'WebSocket Disconnected' }}</span>
       <div v-if="!wsConnected" class="reconnect-controls">
         <el-tooltip effect="dark" placement="bottom">
           <template #content>
             <div>
-              <p>可能的原因:</p>
+              <p>Possible causes:</p>
               <ul>
-                <li>后端服务未启动</li>
-                <li>网络连接问题</li>
-                <li>跨域策略限制</li>
+                <li>Backend service not started</li>
+                <li>Network connection issues</li>
+                <li>Cross-origin policy restrictions</li>
               </ul>
-              <p>排查步骤:</p>
+              <p>Troubleshooting steps:</p>
               <ul>
-                <li>确保后端服务在端口3000运行</li>
-                <li>查看浏览器控制台错误信息</li>
-                <li>检查浏览器网络请求</li>
+                <li>Ensure backend service is running on port 3000</li>
+                <li>Check browser console for error messages</li>
+                <li>Check browser network requests</li>
               </ul>
             </div>
           </template>
-          <el-button type="warning" size="small" icon="Warning">连接失败原因</el-button>
+          <el-button type="warning" size="small" icon="Warning">Connection Failure Reasons</el-button>
         </el-tooltip>
-        <el-button type="primary" size="small" @click="reconnectWebSocket">重新连接</el-button>
+        <el-button type="primary" size="small" @click="reconnectWebSocket">Reconnect</el-button>
       </div>
       <div v-if="wsConnected" class="connection-info">
         <span class="data-source-indicator" :class="{ 'connected': isHardwareConnected, 'disconnected': !isHardwareConnected }">
-          {{ isHardwareConnected ? '已连接到硬件设备' : '硬件设备未连接' }}
+          {{ isHardwareConnected ? 'Connected to hardware device' : 'Hardware device not connected' }}
         </span>
       </div>
     </div>
 
-    <!-- 设备选择对话框 -->
+    <!-- Device selection dialog -->
     <div v-if="showDeviceSelectionDialog" class="dialog-overlay">
       <div class="dialog-content device-selection-dialog">
-        <h3>选择{{ getDeviceTypeName(dropPosition.type) }}</h3>
+        <h3>Select {{ getDeviceTypeName(dropPosition.type) }}</h3>
         
-        <!-- 搜索框 -->
+        <!-- Search box -->
         <div class="search-box">
           <input 
             v-model="deviceSearchQuery" 
             type="text" 
-            placeholder="搜索设备ID..."
+            placeholder="Search device ID..."
             @input="filterDevices"
           />
         </div>
         
-        <!-- 设备列表 -->
+        <!-- Device list -->
         <div class="device-list">
           <div v-if="filteredDevices.length === 0" class="no-devices">
-            没有可用的{{ getDeviceTypeName(dropPosition.type) }}设备
+            No available {{ getDeviceTypeName(dropPosition.type) }} devices
           </div>
           
-          <!-- 设备分组显示 -->
+          <!-- Device group display -->
           <template v-for="(group, index) in deviceGroups" :key="index">
             <div class="device-group" v-if="group.devices.length > 0">
               <div class="group-title">{{ group.title }}</div>

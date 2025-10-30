@@ -11,10 +11,10 @@ const loginRules = reactive(<FormRules>{
     {
       validator: (rule, value, callback) => {
         if (value === "") {
-          callback(new Error("请输入密码"));
+          callback(new Error("Please enter password"));
         } else if (!REGEXP_PWD.test(value)) {
           callback(
-            new Error("密码格式应为8-18位数字、字母、符号的任意两种组合")
+            new Error("Password format should be 8-18 characters with any two combinations of numbers, letters, and symbols")
           );
         } else {
           callback();

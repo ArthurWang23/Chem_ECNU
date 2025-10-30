@@ -45,7 +45,7 @@ const router = useRouter();
           }
         }"
       >
-        抱歉，服务器出错了
+        Sorry, server error
       </p>
       <el-button
         v-motion
@@ -63,7 +63,7 @@ const router = useRouter();
         }"
         @click="router.push('/')"
       >
-        返回首页
+        Back to Home
       </el-button>
     </div>
   </div>
