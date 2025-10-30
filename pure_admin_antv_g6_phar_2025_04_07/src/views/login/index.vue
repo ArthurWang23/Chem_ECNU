@@ -33,7 +33,7 @@ dataThemeChange(overallStyle.value);
 const { title } = useNav();
 
 const ruleForm = reactive({
-  username: "ecnuer",
+  username: "admin",
   password: "123456"
 });
 
@@ -98,7 +98,7 @@ onBeforeUnmount(() => {
       </div>
       <div class="login-box">
         <div class="login-form">
-          <avatar class="avatar" />
+
           <Motion>
             <h2 class="outline-none">{{ title }}</h2>
           </Motion>
